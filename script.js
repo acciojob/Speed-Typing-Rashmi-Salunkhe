@@ -1,4 +1,3 @@
-//your JS code here. If required.
 const quoteDisplay = document.querySelector('.quote-display');
 const quoteInput = document.getElementById('quoteInput');
 const timerElement = document.querySelector('.timer');
@@ -22,28 +21,23 @@ async function renderNewQuote() {
         charSpan.innerText = char;
         quoteDisplay.appendChild(charSpan);
     });
-    quoteInput.value = null;
+    quoteInput.value = '';
     resetTimer();
     startTimer();
 }
 
 // Start the timer
 function startTimer() {
-    timerElement.innerText = '0s';
-    startTime = new Date();
+    startTime = Date.now();
     timerInterval = setInterval(() => {
-        timerElement.innerText = `${getTimerTime()}s`;
+        timerElement.innerText = `${Math.floor((Date.now() - startTime) / 1000)}s`;
     }, 1000);
-}
-
-// Get the elapsed time since the start of typing
-function getTimerTime() {
-    return Math.floor((new Date() - startTime) / 1000);
 }
 
 // Reset the timer
 function resetTimer() {
     clearInterval(timerInterval);
+    timerElement.innerText = '0s';  // Reset display to '0s'
 }
 
 // Compare input to the displayed quote and mark characters as correct or incorrect
@@ -67,7 +61,7 @@ quoteInput.addEventListener('input', () => {
         }
     });
 
-    if (isCorrect) {
+    if (isCorrect && inputArray.length === quoteArray.length) {
         // Typing complete, wait for 3 seconds before fetching a new quote
         resetTimer();
         setTimeout(renderNewQuote, 3000);

@@ -1,72 +1,70 @@
-const quoteDisplay = document.querySelector('.quote-display');
-const quoteInput = document.getElementById('quoteInput');
-const timerElement = document.querySelector('.timer');
+const RANDOM_QUOTE_API_URL = 'http://api.quotable.io/random'
+const quoteDisplayElement = document.getElementById('quoteDisplay')
+const quoteInputElement = document.getElementById('quoteInput')
+const timerElement = document.getElementById('timer')
 
-let startTime;
-let timerInterval;
+const area={}
+quoteInputElement.addEventListener('input', () => {
+  const arrayQuote = quoteDisplayElement.querySelectorAll('span')
+  const arrayValue = quoteInputElement.value.split('')
 
-// Fetch a random quote from the API
-async function getRandomQuote() {
-    const response = await fetch('https://api.quotable.io/random');
-    const data = await response.json();
-    return data.content;
-}
-
-// Display a new quote
-async function renderNewQuote() {
-    const quote = await getRandomQuote();
-    quoteDisplay.innerHTML = '';
-    quote.split('').forEach(char => {
-        const charSpan = document.createElement('span');
-        charSpan.innerText = char;
-        quoteDisplay.appendChild(charSpan);
-    });
-    quoteInput.value = '';
-    resetTimer();
-    startTimer();
-}
-
-// Start the timer
-function startTimer() {
-    startTime = Date.now();
-    timerInterval = setInterval(() => {
-        timerElement.innerText = `${Math.floor((Date.now() - startTime) / 1000)}s`;
-    }, 1000);
-}
-
-// Reset the timer
-function resetTimer() {
-    clearInterval(timerInterval);
-    timerElement.innerText = '0s';  // Reset display to '0s'
-}
-
-// Compare input to the displayed quote and mark characters as correct or incorrect
-quoteInput.addEventListener('input', () => {
-    const quoteArray = quoteDisplay.querySelectorAll('span');
-    const inputArray = quoteInput.value.split('');
-
-    let isCorrect = true;
-    quoteArray.forEach((charSpan, index) => {
-        const char = inputArray[index];
-        if (char == null) {
-            charSpan.classList.remove('correct', 'incorrect');
-            isCorrect = false;
-        } else if (char === charSpan.innerText) {
-            charSpan.classList.add('correct');
-            charSpan.classList.remove('incorrect');
-        } else {
-            charSpan.classList.add('incorrect');
-            charSpan.classList.remove('correct');
-            isCorrect = false;
-        }
-    });
-
-    if (isCorrect && inputArray.length === quoteArray.length) {
-        // Typing complete, wait for 3 seconds before fetching a new quote
-        resetTimer();
-        setTimeout(renderNewQuote, 3000);
+  let correct = true
+  arrayQuote.forEach((characterSpan, index) => {
+    const character = arrayValue[index]
+    if (character == null) {
+      characterSpan.classList.remove('correct')
+      characterSpan.classList.remove('incorrect')
+      correct = false
+    } else if (character === characterSpan.innerText) {
+      characterSpan.classList.add('correct')
+      characterSpan.classList.remove('incorrect')
+    } else {
+      characterSpan.classList.remove('correct')
+      characterSpan.classList.add('incorrect')
+      correct = false
     }
-});
+  })
 
-// Start by rendering the first quote
-renderNewQuote();
+  // if (correct) renderNewQuote()
+  console.log(arrayQuote.length,arrayValue.length)
+  if(arrayQuote.length<=arrayValue.length){
+    console.log(arrayQuote.length,arrayValue.length)
+    clearInterval(area.timer)
+
+    setTimeout(renderNewQuote,3000)
+  }
+})
+
+function getRandomQuote() {
+  return fetch(RANDOM_QUOTE_API_URL)
+    .then(response => response.json())
+    .then(data => data.content)
+}
+
+async function renderNewQuote() {
+  const quote = await getRandomQuote()
+  quoteDisplayElement.innerHTML = ''
+  // quoteDisplayElement.innerText = quote
+  quote.split('').forEach(character => {
+    const characterSpan = document.createElement('span')
+    characterSpan.innerText = character
+    quoteDisplayElement.appendChild(characterSpan)
+  })
+  quoteInputElement.value = null
+  startTimer()
+}
+
+let startTime
+function startTimer() {
+  timerElement.innerText = 0
+  startTime = new Date()
+  area.timer = setInterval(() => {
+    timer.innerText = getTimerTime()
+  }, 1000)
+}
+
+function getTimerTime() {
+  return Math.floor((new Date() - startTime) / 1000)
+}
+
+renderNewQuote()
